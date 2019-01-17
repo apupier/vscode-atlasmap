@@ -20,7 +20,7 @@
 		"commands": [
 			{
 				"command": "atlasmap.open",
-				"title": "Open AtlasMap in default system browser",
+				"title": "Open AtlasMap",
 				"category": "AtlasMap"
 			},
 			{
@@ -61,7 +61,6 @@
 	},
 	"dependencies": {
 		"fetch": "^1.1.0",
-		"opn": "^5.4.0",
 		"vscode": "^1.1.26"
 	},
 	"devDependencies": {
