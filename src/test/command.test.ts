@@ -76,7 +76,7 @@ describe("AtlasMap/Commands", function() {
 			let url:string = "http://localhost:" + port;
 			const body = await getWebUI(url);
 			expect(body, "Unexpected html response body").to.contain("AtlasMap");
-			expect(atlasMapWebView.default.currentPanel._panel.webview.html).to.contain(url);
+			expect(atlasMapWebView.default.currentPanel._panel.webview.html).to.contain(url).and.to.contain('<body style="padding: 0">');
 		});
 	});
 
