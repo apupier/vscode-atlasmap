@@ -2,5 +2,9 @@
 	"editor.insertSpaces": false,
 	"editor.detectIndentation": false,
 	"prettier.tabWidth": 4,
-	"prettier.useTabs": true
+	"prettier.useTabs": true,
+	"didact.registered": [
+		"{\"name\":\"Didact Demo\",\"category\":\"Didact\",\"sourceUri\":\"/home/apupier/git/vscode-didact/demo/didact-demo.didact.md\"}",
+		"{\"name\":\"Create a New Didact Tutorial Extension\",\"category\":\"Didact\",\"sourceUri\":\"/home/apupier/git/vscode-didact/create_extension/create-new-tutorial-with-extension.didact.md\"}"
+	]
 }
