@@ -3,7 +3,7 @@
 node('rhel8'){
 	stage('Checkout repo') {
 		deleteDir()
-		git url: 'https://github.com/jboss-fuse/vscode-atlasmap'
+		git url: 'https://github.com/apupier/vscode-atlasmap', branch:'FUSETOOLS2-672-fixMasterOnJenkins-onjenkins'
 	}
 
 	stage('Install requirements') {
@@ -34,45 +34,5 @@ node('rhel8'){
         def packageJson = readJSON file: 'package.json'
         sh "vsce package -o vscode-atlasmap-${packageJson.version}-${env.BUILD_NUMBER}.vsix"
         sh "npm pack && mv atlasmap-viewer-${packageJson.version}.tgz vscode-atlasmap-${packageJson.version}-${env.BUILD_NUMBER}.tgz"
-	}
-
-	if(params.UPLOAD_LOCATION) {
-		stage('Snapshot') {
-			def filesToPush = findFiles(glob: '**.vsix')
-			sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[0].path} ${UPLOAD_LOCATION}/snapshots/vscode-atlasmap/"
-            stash name:'vsix', includes:filesToPush[0].path
-            def tgzFilesToPush = findFiles(glob: '**.tgz')
-            stash name:'tgz', includes:tgzFilesToPush[0].path
-            sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${tgzFilesToPush[0].path} ${UPLOAD_LOCATION}/snapshots/vscode-atlasmap/"
-		}
-    }
-}
-
-node('rhel8'){
-	if(publishToMarketPlace.equals('true')){
-		timeout(time:5, unit:'DAYS') {
-			input message:'Approve deployment?', submitter: 'apupier,lheinema,bfitzpat,tsedmik,djelinek'
-		}
-
-		stage("Publish to Marketplace") {
-            unstash 'vsix'
-            unstash 'tgz'
-            withCredentials([[$class: 'StringBinding', credentialsId: 'vscode_java_marketplace', variable: 'TOKEN']]) {
-                def vsix = findFiles(glob: '**.vsix')
-                sh 'vsce publish -p ${TOKEN} --packagePath' + " ${vsix[0].path}"
-            }
-            archiveArtifacts artifacts:"**.vsix,**.tgz"
-
-            stage "Promote the build to stable"
-            def vsix = findFiles(glob: '**.vsix')
-            sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${vsix[0].path} ${UPLOAD_LOCATION}/stable/vscode-atlasmap/"
-            def tgz = findFiles(glob: '**.tgz')
-            sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${tgz[0].path} ${UPLOAD_LOCATION}/stable/vscode-atlasmap/"
-            
-            sh "npm install -g ovsx"
-		    withCredentials([[$class: 'StringBinding', credentialsId: 'open-vsx-access-token', variable: 'OVSX_TOKEN']]) {
-			    sh 'ovsx publish -p ${OVSX_TOKEN}' + " ${vsix[0].path}"
-			}
-        }
 	}
 }
